@@ -36,18 +36,22 @@ var chartGroup = svg.append("g")
 // Read CSV
 var url = "assets/data/data.csv"
 d3.csv(url).then(function (censusData) {
+    
+    // Empty state abbr array
+    var states = [];
 
     // parse data
     censusData.forEach(function (data) {
         data.poverty = +data.poverty;
         data.healthcare = +data.healthcare;
-        // console.log(data.poverty);
-        // console.log(data.healthcare);
+        // console.log(data.abbr)
+        states.push(data.abbr);
     });
 
     // create scales
     var xLinearScale = d3.scaleLinear()
-        .domain(d3.extent(censusData, d => d.poverty))
+        // .domain(d3.extent(censusData, d => d.poverty))
+        .domain([8, d3.max(censusData, d => d.poverty)])
         .range([0, width]);
 
     var yLinearScale = d3.scaleLinear()
@@ -74,9 +78,18 @@ d3.csv(url).then(function (censusData) {
         .attr("cx", d => xLinearScale(d.poverty))
         .attr("cy", d => yLinearScale(d.healthcare))
         .attr("r", "10")
-        .attr("fill", "gold")
-        .attr("stroke-width", "1")
-        .attr("stroke", "black");
+        .classed("stateCircle", true);
+
+    var fontSize = 12
+    var statesGroup = chartGroup.selectAll(null)
+        .data(censusData)
+        .enter()
+        .append('text')
+        .text(d => d.abbr)
+        .attr('x', d => xLinearScale(d.poverty))
+        .attr('y', d => yLinearScale(d.healthcare)+(fontSize/2))
+        .attr('font-size', `${fontSize}px`)
+        .classed('stateText', true);
 
 }).catch(function (error) {
     console.log(error);

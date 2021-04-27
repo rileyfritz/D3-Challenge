@@ -1,3 +1,5 @@
+// The portion of the code append the SVG element was taken from class examples
+
 // if the SVG area isn't empty when the browser loads,
 // remove it and replace it with a resized version of the chart
 var svgArea = d3.select("body").select("svg");
@@ -37,20 +39,14 @@ var chartGroup = svg.append("g")
 var url = "assets/data/data.csv"
 d3.csv(url).then(function (censusData) {
     
-    // Empty state abbr array
-    var states = [];
-
     // parse data
     censusData.forEach(function (data) {
         data.poverty = +data.poverty;
         data.healthcare = +data.healthcare;
-        // console.log(data.abbr)
-        states.push(data.abbr);
     });
 
     // create scales
     var xLinearScale = d3.scaleLinear()
-        // .domain(d3.extent(censusData, d => d.poverty))
         .domain([8, d3.max(censusData, d => d.poverty)])
         .range([0, width]);
 
@@ -69,6 +65,22 @@ d3.csv(url).then(function (censusData) {
 
     chartGroup.append("g")
         .call(yAxis);
+    
+    // Append xaxis title
+    chartGroup.append("text")
+        .attr("transform", `translate(${width / 2}, ${height + 40})`)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "16px")
+        .text("% In Poverty");
+
+    // Append yaxis title
+    chartGroup.append("text")
+        .attr("transform", `translate(-30, ${height/2})rotate(270)`)
+        // .attr("transform", `translate(0, ${height/2})`)
+        // .attr("transform", "rotate(-90deg)")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "16px")
+        .text("% Lacking Healthcare");
 
     // append circles
     var circlesGroup = chartGroup.selectAll("circle")
